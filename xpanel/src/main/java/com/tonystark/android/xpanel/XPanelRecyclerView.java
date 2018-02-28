@@ -16,6 +16,8 @@ public class XPanelRecyclerView extends RecyclerView implements IXPanelListScrol
 
     private boolean isInTop = true;
 
+    private boolean isMeasureAll = false;
+
     private boolean isScrollToEnd;
 
     public XPanelRecyclerView(Context context) {
@@ -98,7 +100,21 @@ public class XPanelRecyclerView extends RecyclerView implements IXPanelListScrol
     }
 
     @Override
-    public boolean isSlidable() {
+    public boolean canScroll() {
         return getLayoutManager().canScrollVertically();
+    }
+
+    public XPanelRecyclerViewLayoutManager getLayoutManager() {
+        return (XPanelRecyclerViewLayoutManager) super.getLayoutManager();
+    }
+
+    @Override
+    public void setScrollLock(boolean isScroll) {
+        getLayoutManager().setScrollLock(isScroll);
+    }
+
+    @Override
+    public boolean isMeasureAll() {
+        return getLayoutManager().isMeasureAll();
     }
 }

@@ -10,6 +10,10 @@ public interface IXPanelListScrollCtrl {
 
     boolean isScrollInBegin();
 
-    boolean isSlidable();
+    boolean canScroll();
+
+    void setScrollLock(boolean isScroll);
+
+    boolean isMeasureAll();
 
 }

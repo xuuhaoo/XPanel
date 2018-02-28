@@ -16,6 +16,8 @@ public class XPanelRecyclerViewLayoutManager extends LinearLayoutManager {
 
     private boolean isScrollEnabled = true;
 
+    private boolean isMeasureAll = false;
+
     private int[] mMeasuredDimension = new int[2];
 
     public XPanelRecyclerViewLayoutManager(Context context) {
@@ -30,10 +32,19 @@ public class XPanelRecyclerViewLayoutManager extends LinearLayoutManager {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public void setScrollEnabled(boolean flag) {
-        this.isScrollEnabled = flag;
-        this.setAutoMeasureEnabled(flag);
+    public void setMeasureAll(boolean flag) {
+        isMeasureAll = flag;
+        setScrollLock(!flag);
+        this.setAutoMeasureEnabled(!flag);
         requestLayout();
+    }
+
+    public boolean isMeasureAll() {
+        return isMeasureAll;
+    }
+
+    void setScrollLock(boolean flag) {
+        this.isScrollEnabled = flag;
     }
 
     @Override

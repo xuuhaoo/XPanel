@@ -21,13 +21,15 @@ public class MainActivity extends AppCompatActivity {
 
     private List<String> mDataList = new ArrayList<>();
 
+    private XPanelView xPanelView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
 
-        final XPanelView xPanelView = findViewById(R.id.xpanelview);
-        for (int i = 0; i < 40; i++) {
+        xPanelView = findViewById(R.id.xpanelview);
+        for (int i = 0; i < 50; i++) {
             mDataList.add("item name : " + i);
         }
 
@@ -39,10 +41,11 @@ public class MainActivity extends AppCompatActivity {
         headerView.setCanDrag(true);
 
         xPanelView.setHeaderLayout(headerView);
-        xPanelView.setScrollable(true);
+        xPanelView.setMeasureAll(false);
         xPanelView.setChuttyMode(true);
+        xPanelView.setCanFling(true);
         xPanelView.setExposedPercent(0.25f);
-        xPanelView.setKickBackPercent(0.40f);
+        xPanelView.setKickBackPercent(0.65f);
         xPanelView.setDragBaseLine((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 500, getResources().getDisplayMetrics()));
     }
 
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     if (mToast != null) {
                         mToast.cancel();
                     }
+
                     mToast = Toast.makeText(holder.mItem.getContext(), "点击了:" + position + "个", Toast.LENGTH_SHORT);
                     mToast.show();
                 }

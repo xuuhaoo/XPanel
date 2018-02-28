@@ -3,6 +3,7 @@ package com.tonystark.android.xpanel;
 import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -34,6 +35,10 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     private int mBaseLinePixel;
 
+    private boolean isDragUp;
+
+    private boolean isCanFling;
+
     public XPanelDragMotionDetection(ViewGroup dragView, ViewGroup dragContainer, IXPanelListScrollCtrl scrollCtrl) {
         mDragView = dragView;
         mDragContainer = dragContainer;
@@ -64,12 +69,15 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
                 baseline = exposedHeight;
             }
             if (currentHeight <= baseline) {
+                setScrollLock(false);
                 return containerHeight - baseline;
             }
+        } else {
+            setScrollLock(true);
         }
 
         //resolve list can not scroll,fixed height
-        if (!mScrollCtrl.isSlidable()) {
+        if (!mScrollCtrl.canScroll()) {
             int offset = -mDragView.getMeasuredHeight() + containerHeight;
             if (top <= offset) {
                 return offset;
@@ -89,11 +97,13 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
             if (dy > 0) {
                 //move down
                 if (!mScrollCtrl.isScrollInBegin()) {
+                    Log.i("DragVer", "move down");
                     return 0;
                 }
             } else {
                 //move up
                 if (!mScrollCtrl.isScrollInEnd()) {
+                    Log.i("DragVer", "move up");
                     return 0;
                 }
             }
@@ -110,6 +120,7 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
     @Override
     public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
         mOffsetPixel = mDragContainer.getMeasuredHeight() - top;
+        isDragUp = dy < 0;
     }
 
     @Override
@@ -129,14 +140,28 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
                 mDragHelper.settleCapturedViewAt(0, mOriginTop);
                 isOriginState = true;
             }
-            ViewCompat.postInvalidateOnAnimation(mDragContainer);
         }
+        fling();
+        ViewCompat.postInvalidateOnAnimation(mDragContainer);
+    }
+
+    private void fling() {
+        if (!isCanFling || isChuttyMode) {
+            return;
+        }
+        mDragHelper.flingCapturedView(0, 0, 0, mOriginTop);
     }
 
     @Override
     public void onViewDragStateChanged(int state) {
         if (state == ViewDragHelper.STATE_IDLE) {
             mDragHelper.abort();
+        }
+    }
+
+    private void setScrollLock(boolean isScroll) {
+        if (!mScrollCtrl.isMeasureAll()) {
+            mScrollCtrl.setScrollLock(isScroll);
         }
     }
 
@@ -183,5 +208,9 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     public ViewDragHelper getDragHelper() {
         return mDragHelper;
+    }
+
+    public void setCanFling(boolean canFling) {
+        isCanFling = canFling;
     }
 }

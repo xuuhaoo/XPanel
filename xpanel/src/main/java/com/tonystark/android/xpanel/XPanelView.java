@@ -49,10 +49,6 @@ public class XPanelView extends FrameLayout {
      * values range in {0 - 1} can not be zero.
      */
     protected float mExposedPercent;
-    /**
-     * Set the chutty mode open or close.
-     */
-    protected boolean isChuttyMode;
 
     public XPanelView(Context context) {
         super(context);
@@ -102,20 +98,6 @@ public class XPanelView extends FrameLayout {
         mDetection = new XPanelDragMotionDetection(mDragViewGroup, this, mListView);
     }
 
-    public void setAdapter(AbsXPanelAdapter adapter) {
-        mListView.setAdapter(adapter);
-        mAdapter = adapter;
-    }
-
-    public void setHeaderLayout(View headerLayout) {
-        mDragViewGroup.removeView(mHeaderLayout);
-        if (headerLayout == null) {
-            return;
-        }
-        mHeaderLayout = headerLayout;
-        mDragViewGroup.addView(mHeaderLayout, 0);
-    }
-
     @Override
     public void computeScroll() {
         if (mDetection.getDragHelper().continueSettling(true)) {
@@ -143,12 +125,39 @@ public class XPanelView extends FrameLayout {
     }
 
     /**
+     * Set a new adapter to provide child views on demand.
+     * <p>
+     * When adapter is changed, all existing views are recycled back to the pool. If the pool has
+     * only one adapter, it will be cleared.
+     *
+     * @param adapter The new adapter to set, or null to set no adapter.
+     */
+    public void setAdapter(AbsXPanelAdapter adapter) {
+        mListView.setAdapter(adapter);
+        mAdapter = adapter;
+    }
+
+    /**
+     * Set a new header to provide a layout ahead of list.
+     *
+     * @param headerLayout The new layout to set.
+     */
+    public void setHeaderLayout(View headerLayout) {
+        mDragViewGroup.removeView(mHeaderLayout);
+        if (headerLayout == null) {
+            return;
+        }
+        mHeaderLayout = headerLayout;
+        mDragViewGroup.addView(mHeaderLayout, 0);
+    }
+
+    /**
      * Make the list can not scroll and fixed the height of list.
      *
-     * @param canScroll can scroll or not,true is slidable
+     * @param isMeasureAll true is recycler view can't slip,it will measure all item.
      */
-    public void setScrollable(boolean canScroll) {
-        ((XPanelRecyclerViewLayoutManager) mListView.getLayoutManager()).setScrollEnabled(canScroll);
+    public void setMeasureAll(boolean isMeasureAll) {
+        mListView.getLayoutManager().setMeasureAll(isMeasureAll);
     }
 
     /**
@@ -240,8 +249,7 @@ public class XPanelView extends FrameLayout {
      * @param chuttyMode true is has chutty mode.
      */
     public void setChuttyMode(boolean chuttyMode) {
-        isChuttyMode = chuttyMode;
-        mDetection.setChuttyMode(isChuttyMode);
+        mDetection.setChuttyMode(chuttyMode);
     }
 
     /**
@@ -254,11 +262,20 @@ public class XPanelView extends FrameLayout {
         mDetection.setBaseLinePixel(pixel);
     }
 
+    /**
+     * Set the XPanel can fling.
+     *
+     * @param isCanFling true is can fling.
+     */
+    public void setCanFling(boolean isCanFling) {
+        mDetection.setCanFling(isCanFling);
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        if (!mListView.isSlidable()) {
+        if (!mListView.canScroll()) {
             int headerHeightPixel = 0;
             if (mHeaderLayout != null) {
                 headerHeightPixel = mHeaderLayout.getMeasuredHeight();
@@ -275,19 +292,16 @@ public class XPanelView extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        if (changed) {
-            View view = getChildAt(0);
-            if (view instanceof LinearLayout) {
-                int childLeft = getPaddingLeft();
-                int childTop = getPaddingTop();
-                int topOffset = (int) (getMeasuredHeight() - getMeasuredHeight() * (mExposedPercent));
-                view.layout(childLeft,
-                        childTop + topOffset,
-                        childLeft + view.getMeasuredWidth(),
-                        childTop + topOffset + view.getMeasuredHeight());
-                mDetection.setOriginTop(childTop + topOffset);
-            }
+        View view = getChildAt(0);
+        if (view instanceof LinearLayout) {
+            int childLeft = getPaddingLeft();
+            int childTop = getPaddingTop();
+            int topOffset = (int) (getMeasuredHeight() - getMeasuredHeight() * (mExposedPercent));
+            view.layout(childLeft,
+                    childTop + topOffset,
+                    childLeft + view.getMeasuredWidth(),
+                    childTop + topOffset + view.getMeasuredHeight());
+            mDetection.setOriginTop(childTop + topOffset);
         }
     }
 }
