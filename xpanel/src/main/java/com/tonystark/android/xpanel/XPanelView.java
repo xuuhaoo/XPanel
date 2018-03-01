@@ -107,13 +107,12 @@ public class XPanelView extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return mDetection.getDragHelper().shouldInterceptTouchEvent(ev);
+        return mDetection.shouldInterceptTouchEvent(ev);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mDetection.getDragHelper().processTouchEvent(event);
-        return true;
+        return mDetection.processTouchEvent(event);
     }
 
     protected XPanelRecyclerView initRecyclerView(Context context) {

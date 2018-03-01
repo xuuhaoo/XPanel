@@ -1,5 +1,6 @@
 package com.tonystark.android.myapplication;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tonystark.android.xpanel.AbsXPanelAdapter;
-import com.tonystark.android.xpanel.XPanelDefaultHeaderView;
 import com.tonystark.android.xpanel.XPanelDragMotionDetection;
 import com.tonystark.android.xpanel.XPanelView;
 
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        xPanelView.setHeaderLayout(headerView);
         ViewGroup vp = new FrameLayout(this);
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
         vp.setLayoutParams(params);
         vp.setBackgroundColor(Color.BLUE);
@@ -107,18 +107,18 @@ public class MainActivity extends AppCompatActivity {
                     if (mToast != null) {
                         mToast.cancel();
                     }
-                    if (position == 0) {
-                        xPanelView.setHeaderLayout(null);
-                    } else {
-                        XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(MainActivity.this);
-                        headerView.setCanDrag(true);
-
-                        xPanelView.setHeaderLayout(headerView);
-                    }
-//                    if (position == 0 || position == 24) {
-//                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
-//                        startActivity(intent);
+//                    if (position == 0) {
+//                        xPanelView.setHeaderLayout(null);
+//                    } else {
+//                        XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(MainActivity.this);
+//                        headerView.setCanDrag(true);
+//
+//                        xPanelView.setHeaderLayout(headerView);
 //                    }
+                    if (position == 0 || position == 24) {
+                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
+                        startActivity(intent);
+                    }
                     mToast = Toast.makeText(holder.mItem.getContext(), "点击了:" + position + "个", Toast.LENGTH_SHORT);
                     mToast.show();
                 }

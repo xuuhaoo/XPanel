@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -268,6 +269,15 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     public void setOnXPanelMotionListener(OnXPanelMotionListener onXPanelMotionListener) {
         mOnXPanelMotionListener = onXPanelMotionListener;
+    }
+
+    public boolean shouldInterceptTouchEvent(MotionEvent ev) {
+        return getDragHelper().shouldInterceptTouchEvent(ev);
+    }
+
+    public boolean processTouchEvent(MotionEvent event) {
+        getDragHelper().processTouchEvent(event);
+        return true;
     }
 
     public interface DragMotion {
