@@ -35,8 +35,6 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     private int mOffsetPixel;
 
-    private int mBaseLinePixel;
-
     private boolean isCanFling;
 
     private boolean isDragUp;
@@ -55,7 +53,6 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         mDragHelper = ViewDragHelper.create(mDragContainer, 1.0f, this);
         isOriginState = true;
         mKickBackPercent = 0.5f;
-        mBaseLinePixel = 0;
     }
 
     @Override
@@ -72,13 +69,10 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
             //move down
             int currentHeight = containerHeight - top;
             int exposedHeight = containerHeight - mOriginTop;
-            if (mBaseLinePixel > exposedHeight) {
-                mBaseLinePixel = exposedHeight;
-            }
-            if (currentHeight <= mBaseLinePixel) {
+            if (currentHeight <= exposedHeight) {
                 setScrollLock(false);
                 isInBaseLine = true;
-                return containerHeight - mBaseLinePixel;
+                return mOriginTop;
             } else {
                 isInBaseLine = false;
             }
@@ -250,10 +244,6 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     public int getOriginTop() {
         return mOriginTop;
-    }
-
-    public void setBaseLinePixel(int baseLinePixel) {
-        mBaseLinePixel = baseLinePixel;
     }
 
     public void setChuttyMode(boolean chuttyMode) {

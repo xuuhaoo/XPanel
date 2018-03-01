@@ -1,5 +1,6 @@
 package com.tonystark.android.myapplication;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,24 +34,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_layout);
 
         xPanelView = findViewById(R.id.xpanelview);
-//        for (int i = 0; i < 15; i++) {
-//            mDataList.add("item name : " + i);
-//        }
-//
-//        AbsXPanelAdapter absXPanelAdapter = new XPanelAdapter();
-//        xPanelView.setAdapter(absXPanelAdapter);
-//        absXPanelAdapter.notifyDataSetChanged();
+        for (int i = 0; i < 15; i++) {
+            mDataList.add("item name : " + i);
+        }
 
-        XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(this);
-        headerView.setCanDrag(true);
+        AbsXPanelAdapter absXPanelAdapter = new XPanelAdapter();
+        xPanelView.setAdapter(absXPanelAdapter);
+        absXPanelAdapter.notifyDataSetChanged();
 
-        xPanelView.setHeaderLayout(headerView);
+//        XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(this);
+//        headerView.setCanDrag(true);
+
+//        xPanelView.setHeaderLayout(headerView);
+        ViewGroup vp = new FrameLayout(this);
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
+        vp.setLayoutParams(params);
+        vp.setBackgroundColor(Color.BLUE);
+        xPanelView.setHeaderLayout(vp);
         xPanelView.setMeasureAll(false);
         xPanelView.setChuttyMode(false);
         xPanelView.setCanFling(true);
         xPanelView.setExposedPercent(0.25f);
         xPanelView.setKickBackPercent(0.65f);
-        xPanelView.setDragBaseLine((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 500, getResources().getDisplayMetrics()));
         xPanelView.setOnXPanelMotionListener(new XPanelDragMotionDetection.OnXPanelMotionListener() {
             @Override
             public void OnDrag(int dragMotion, int offset) {

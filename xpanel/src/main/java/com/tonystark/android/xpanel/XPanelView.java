@@ -263,16 +263,6 @@ public class XPanelView extends FrameLayout {
     }
 
     /**
-     * Set the base line in parent height in pixel,it should smaller than exposed height.
-     * the view will be blocked When drag position smaller than base line.
-     *
-     * @param pixel the pixel you want to exposed it.
-     */
-    public void setDragBaseLine(int pixel) {
-        mDetection.setBaseLinePixel(pixel);
-    }
-
-    /**
      * Set the XPanel can fling.When your set the chutty mode is true,than this flag is invalid.
      *
      * @param isCanFling true is can fling.
