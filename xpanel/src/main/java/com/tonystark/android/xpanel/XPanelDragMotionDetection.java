@@ -37,9 +37,15 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     private int mBaseLinePixel;
 
+    private boolean isCanFling;
+
     private boolean isDragUp;
 
-    private boolean isCanFling;
+    private boolean isInFling;
+
+    private boolean isInBaseLine;
+
+    private OnXPanelMotionListener mOnXPanelMotionListener;
 
     public XPanelDragMotionDetection(ViewGroup dragView, ViewGroup dragContainer, IXPanelListScrollCtrl scrollCtrl) {
         mDragView = dragView;
@@ -66,16 +72,19 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
             //move down
             int currentHeight = containerHeight - top;
             int exposedHeight = containerHeight - mOriginTop;
-            int baseline = mBaseLinePixel;
-            if (baseline > exposedHeight) {
-                baseline = exposedHeight;
+            if (mBaseLinePixel > exposedHeight) {
+                mBaseLinePixel = exposedHeight;
             }
-            if (currentHeight <= baseline) {
+            if (currentHeight <= mBaseLinePixel) {
                 setScrollLock(false);
-                return containerHeight - baseline;
+                isInBaseLine = true;
+                return containerHeight - mBaseLinePixel;
+            } else {
+                isInBaseLine = false;
             }
         } else {
             setScrollLock(true);
+            isInBaseLine = false;
         }
 
         //resolve list can not scroll,fixed height
@@ -123,17 +132,40 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
     public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
         mOffsetPixel = mDragContainer.getMeasuredHeight() - top;
         isDragUp = dy < 0;
+
         if (top == mOriginTop) {
             isOriginState = true;
         } else {
             isOriginState = false;
         }
-        if (top <= 0) {
-            isCeiling = true;
-        }else{
-            isCeiling = false;
+
+        if (mOnXPanelMotionListener != null) {
+            int offset = getOffsetPixel();
+
+            if (isInFling) {
+                mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_FLING, offset);
+            } else {
+                if (isDragUp) {
+                    mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_UP, offset);
+                } else {
+                    if (!isInBaseLine) {
+                        mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_DOWN, offset);
+                    }
+                }
+            }
+
+            if (top <= 0 != isCeiling) {//call once
+                mOnXPanelMotionListener.OnCeiling(top <= 0);
+            }
         }
-        Log.i("Position", "mOffsetPixel:" + mOffsetPixel + " mOriginTop:" + mOriginTop + " isCeiling:" + isCeiling + " isOriginState:" + isOriginState);
+
+        isCeiling = top <= 0;
+        Log.i("Position", "mOffsetPixel:" + mOffsetPixel +
+                " mOriginTop:" + mOriginTop +
+                " isCeiling:" + isCeiling +
+                " isOriginState:" + isOriginState +
+                " isDragUp" + isDragUp);
+
     }
 
     @Override
@@ -143,7 +175,6 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     @Override
     public void onViewReleased(View releasedChild, float xvel, float yvel) {
-
         if (isChuttyMode) {
             float threshold = mDragContainer.getMeasuredHeight() * (mKickBackPercent);
 
@@ -162,6 +193,7 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         if (!isCanFling || isChuttyMode) {
             return;
         }
+        isInFling = true;
         mDragHelper.flingCapturedView(0, mDragContainer.getMeasuredHeight() - mDragView.getMeasuredHeight(), 0, mOriginTop);
     }
 
@@ -169,6 +201,11 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
     public void onViewDragStateChanged(int state) {
         if (state == ViewDragHelper.STATE_IDLE) {
             mDragHelper.abort();
+            isInFling = false;
+            if (mOnXPanelMotionListener != null) {
+                int offset = getOffsetPixel();
+                mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_STOP, offset);
+            }
         }
     }
 
@@ -231,5 +268,51 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         isCanFling = canFling;
     }
 
+    public boolean isCeiling() {
+        return isCeiling;
+    }
 
+    public boolean isInBaseLine() {
+        return isInBaseLine;
+    }
+
+    public void setOnXPanelMotionListener(OnXPanelMotionListener onXPanelMotionListener) {
+        mOnXPanelMotionListener = onXPanelMotionListener;
+    }
+
+    public interface DragMotion {
+        /**
+         * Drag down
+         */
+        int DRAG_DOWN = 1;
+        /**
+         * Drag up
+         */
+        int DRAG_UP = 2;
+        /**
+         * Drag stop
+         */
+        int DRAG_STOP = 3;
+        /**
+         * When not touch but in scrolling.
+         */
+        int DRAG_FLING = 4;
+    }
+
+    public interface OnXPanelMotionListener {
+        /**
+         * When user drag the view or fling.
+         *
+         * @param dragMotion drag motion.
+         * @param offset     offset from original point.
+         */
+        void OnDrag(int dragMotion, int offset);
+
+        /**
+         * When the drag view touch ceil,top may be small than or equal 0.
+         *
+         * @param isCeiling true is in ceiling.
+         */
+        void OnCeiling(boolean isCeiling);
+    }
 }

@@ -295,7 +295,6 @@ public class XPanelView extends FrameLayout {
         View view = getChildAt(0);
         if (view instanceof LinearLayout) {
             if (!mDetection.isOriginState()) {//if is not origin state,the window height definitely changed, so need to restore the height
-                int originTop = mDetection.getOriginTop();
                 int childLeft = getPaddingLeft();
                 int topShouldBe = getMeasuredHeight() - mDetection.getOffsetPixel();
                 view.layout(childLeft,
@@ -312,6 +311,12 @@ public class XPanelView extends FrameLayout {
                         childTop + topOffset + view.getMeasuredHeight());
                 mDetection.setOriginTop(childTop + topOffset);
             }
+        }
+    }
+
+    public void setOnXPanelMotionListener(XPanelDragMotionDetection.OnXPanelMotionListener listener) {
+        if (mDetection != null) {
+            mDetection.setOnXPanelMotionListener(listener);
         }
     }
 }
