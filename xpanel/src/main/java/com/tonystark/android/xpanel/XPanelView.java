@@ -138,6 +138,16 @@ public class XPanelView extends FrameLayout {
     }
 
     /**
+     * Retrieves the previously set adapter or null if no adapter is set.
+     *
+     * @return The previously set adapter
+     * @see #setAdapter(AbsXPanelAdapter)
+     */
+    public AbsXPanelAdapter getAdapter() {
+        return mAdapter;
+    }
+
+    /**
      * Set a new header to provide a layout ahead of list.
      *
      * @param headerLayout The new layout to set.
