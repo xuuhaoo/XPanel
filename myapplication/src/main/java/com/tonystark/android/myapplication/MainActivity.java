@@ -31,20 +31,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_layout);
 
         xPanelView = findViewById(R.id.xpanelview);
-        for (int i = 0; i < 15; i++) {
-            mDataList.add("item name : " + i);
-        }
-
-        AbsXPanelAdapter absXPanelAdapter = new XPanelAdapter();
-        xPanelView.setAdapter(absXPanelAdapter);
-        absXPanelAdapter.notifyDataSetChanged();
+//        for (int i = 0; i < 15; i++) {
+//            mDataList.add("item name : " + i);
+//        }
+//
+//        AbsXPanelAdapter absXPanelAdapter = new XPanelAdapter();
+//        xPanelView.setAdapter(absXPanelAdapter);
+//        absXPanelAdapter.notifyDataSetChanged();
 
         XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(this);
         headerView.setCanDrag(true);
 
         xPanelView.setHeaderLayout(headerView);
         xPanelView.setMeasureAll(false);
-        xPanelView.setChuttyMode(true);
+        xPanelView.setChuttyMode(false);
         xPanelView.setCanFling(true);
         xPanelView.setExposedPercent(0.25f);
         xPanelView.setKickBackPercent(0.65f);
@@ -99,7 +99,14 @@ public class MainActivity extends AppCompatActivity {
                     if (mToast != null) {
                         mToast.cancel();
                     }
+                    if (position == 0) {
+                        xPanelView.setHeaderLayout(null);
+                    } else {
+                        XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(MainActivity.this);
+                        headerView.setCanDrag(true);
 
+                        xPanelView.setHeaderLayout(headerView);
+                    }
 //                    if (position == 0 || position == 24) {
 //                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
 //                        startActivity(intent);

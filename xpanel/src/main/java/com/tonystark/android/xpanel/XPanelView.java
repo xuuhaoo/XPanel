@@ -314,7 +314,12 @@ public class XPanelView extends FrameLayout {
             } else {
                 int childLeft = getPaddingLeft();
                 int childTop = getPaddingTop();
-                int topOffset = (int) (getMeasuredHeight() - getMeasuredHeight() * (mExposedPercent));
+                int topOffset = 0;
+                if (getMeasuredHeight() * mExposedPercent > view.getMeasuredHeight()) {
+                    topOffset = getMeasuredHeight() - view.getMeasuredHeight();
+                } else {
+                    topOffset = (int) (getMeasuredHeight() - getMeasuredHeight() * (mExposedPercent));
+                }
                 view.layout(childLeft,
                         childTop + topOffset,
                         childLeft + view.getMeasuredWidth(),

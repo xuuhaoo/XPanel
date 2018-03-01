@@ -108,13 +108,11 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
             if (dy > 0) {
                 //move down
                 if (!mScrollCtrl.isScrollInBegin()) {
-                    Log.i("DragVer", "move down");
                     return 0;
                 }
             } else {
                 //move up
                 if (!mScrollCtrl.isScrollInEnd()) {
-                    Log.i("DragVer", "move up");
                     return 0;
                 }
             }
@@ -194,7 +192,9 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
             return;
         }
         isInFling = true;
-        mDragHelper.flingCapturedView(0, mDragContainer.getMeasuredHeight() - mDragView.getMeasuredHeight(), 0, mOriginTop);
+        int minTop = mDragContainer.getMeasuredHeight() - mDragView.getMeasuredHeight();
+        int maxTop = mOriginTop;
+        mDragHelper.flingCapturedView(0, minTop, 0, maxTop);
     }
 
     @Override
