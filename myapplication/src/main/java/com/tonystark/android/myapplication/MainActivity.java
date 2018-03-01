@@ -1,6 +1,5 @@
 package com.tonystark.android.myapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -101,10 +100,10 @@ public class MainActivity extends AppCompatActivity {
                         mToast.cancel();
                     }
 
-                    if (position == 0 || position == 24) {
-                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
-                        startActivity(intent);
-                    }
+//                    if (position == 0 || position == 24) {
+//                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
+//                        startActivity(intent);
+//                    }
                     mToast = Toast.makeText(holder.mItem.getContext(), "点击了:" + position + "个", Toast.LENGTH_SHORT);
                     mToast.show();
                 }
