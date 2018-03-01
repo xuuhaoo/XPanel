@@ -263,7 +263,7 @@ public class XPanelView extends FrameLayout {
     }
 
     /**
-     * Set the XPanel can fling.
+     * Set the XPanel can fling.When your set the chutty mode is true,than this flag is invalid.
      *
      * @param isCanFling true is can fling.
      */
@@ -294,14 +294,24 @@ public class XPanelView extends FrameLayout {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         View view = getChildAt(0);
         if (view instanceof LinearLayout) {
-            int childLeft = getPaddingLeft();
-            int childTop = getPaddingTop();
-            int topOffset = (int) (getMeasuredHeight() - getMeasuredHeight() * (mExposedPercent));
-            view.layout(childLeft,
-                    childTop + topOffset,
-                    childLeft + view.getMeasuredWidth(),
-                    childTop + topOffset + view.getMeasuredHeight());
-            mDetection.setOriginTop(childTop + topOffset);
+            if (!mDetection.isOriginState()) {//if is not origin state,the window height definitely changed, so need to restore the height
+                int originTop = mDetection.getOriginTop();
+                int childLeft = getPaddingLeft();
+                int topShouldBe = getMeasuredHeight() - mDetection.getOffsetPixel();
+                view.layout(childLeft,
+                        topShouldBe,
+                        childLeft + view.getMeasuredWidth(),
+                        topShouldBe + view.getMeasuredHeight());
+            } else {
+                int childLeft = getPaddingLeft();
+                int childTop = getPaddingTop();
+                int topOffset = (int) (getMeasuredHeight() - getMeasuredHeight() * (mExposedPercent));
+                view.layout(childLeft,
+                        childTop + topOffset,
+                        childLeft + view.getMeasuredWidth(),
+                        childTop + topOffset + view.getMeasuredHeight());
+                mDetection.setOriginTop(childTop + topOffset);
+            }
         }
     }
 }

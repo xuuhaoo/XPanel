@@ -1,5 +1,6 @@
 package com.tonystark.android.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_layout);
 
         xPanelView = findViewById(R.id.xpanelview);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 5; i++) {
             mDataList.add("item name : " + i);
         }
 
@@ -41,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         headerView.setCanDrag(true);
 
         xPanelView.setHeaderLayout(headerView);
-        xPanelView.setMeasureAll(false);
-        xPanelView.setChuttyMode(true);
+        xPanelView.setMeasureAll(true);
+        xPanelView.setChuttyMode(false);
         xPanelView.setCanFling(true);
         xPanelView.setExposedPercent(0.25f);
         xPanelView.setKickBackPercent(0.65f);
@@ -67,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
                         mToast.cancel();
                     }
 
+                    if (position == 0 || position == 24) {
+                        Intent intent = new Intent(MainActivity.this, InputActivity.class);
+                        startActivity(intent);
+                    }
                     mToast = Toast.makeText(holder.mItem.getContext(), "点击了:" + position + "个", Toast.LENGTH_SHORT);
                     mToast.show();
                 }

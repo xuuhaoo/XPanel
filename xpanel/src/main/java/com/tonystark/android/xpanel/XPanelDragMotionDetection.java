@@ -25,6 +25,8 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     private boolean isChuttyMode;
 
+    private boolean isCeiling;
+
     private boolean isOriginState;
 
     private int mOriginTop;
@@ -121,6 +123,17 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
     public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
         mOffsetPixel = mDragContainer.getMeasuredHeight() - top;
         isDragUp = dy < 0;
+        if (top == mOriginTop) {
+            isOriginState = true;
+        } else {
+            isOriginState = false;
+        }
+        if (top <= 0) {
+            isCeiling = true;
+        }else{
+            isCeiling = false;
+        }
+        Log.i("Position", "mOffsetPixel:" + mOffsetPixel + " mOriginTop:" + mOriginTop + " isCeiling:" + isCeiling + " isOriginState:" + isOriginState);
     }
 
     @Override
@@ -130,15 +143,15 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     @Override
     public void onViewReleased(View releasedChild, float xvel, float yvel) {
+
         if (isChuttyMode) {
             float threshold = mDragContainer.getMeasuredHeight() * (mKickBackPercent);
 
             if (mOffsetPixel >= threshold) {//before touch the captured view ,view state is origin state.
-                mDragHelper.settleCapturedViewAt(0, 0);
-                isOriginState = false;
+                int top = Math.max(mDragContainer.getMeasuredHeight() - mDragView.getMeasuredHeight(), 0);
+                mDragHelper.settleCapturedViewAt(0, top);
             } else {
                 mDragHelper.settleCapturedViewAt(0, mOriginTop);
-                isOriginState = true;
             }
         }
         fling();
@@ -149,7 +162,7 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         if (!isCanFling || isChuttyMode) {
             return;
         }
-        mDragHelper.flingCapturedView(0, 0, 0, mOriginTop);
+        mDragHelper.flingCapturedView(0, mDragContainer.getMeasuredHeight() - mDragView.getMeasuredHeight(), 0, mOriginTop);
     }
 
     @Override
@@ -198,6 +211,10 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         mOffsetPixel = mOriginTop;
     }
 
+    public int getOriginTop() {
+        return mOriginTop;
+    }
+
     public void setBaseLinePixel(int baseLinePixel) {
         mBaseLinePixel = baseLinePixel;
     }
@@ -213,4 +230,6 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
     public void setCanFling(boolean canFling) {
         isCanFling = canFling;
     }
+
+
 }
