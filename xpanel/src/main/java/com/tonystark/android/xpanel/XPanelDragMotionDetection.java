@@ -186,6 +186,9 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         if (!isCanFling || isChuttyMode) {
             return;
         }
+        if (isCeiling && !mScrollCtrl.isScrollInBegin()) {
+            return;
+        }
         isInFling = true;
         int minTop = mDragContainer.getMeasuredHeight() - mDragView.getMeasuredHeight();
         int maxTop = mOriginTop;
