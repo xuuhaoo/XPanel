@@ -318,9 +318,9 @@ public class XPanelView extends FrameLayout {
         }
     }
 
-    public void setOnXPanelMotionListener(XPanelDragMotionDetection.OnXPanelMotionListener listener) {
+    public void setOnXPanelMotionListener(XPanelDragMotionDetection.OnXPanelEventListener listener) {
         if (mDetection != null) {
-            mDetection.setOnXPanelMotionListener(listener);
+            mDetection.setOnXPanelEventListener(listener);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.tonystark.android.myapplication;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -42,41 +43,45 @@ public class MainActivity extends AppCompatActivity {
 
         XPanelDefaultHeaderView headerView = new XPanelDefaultHeaderView(this);
         headerView.setCanDrag(true);
-
+        headerView.setForegroundColor(Color.RED);
         xPanelView.setHeaderLayout(headerView);
-        xPanelView.setMeasureAll(true);
-        xPanelView.setChuttyMode(false);
+        xPanelView.setMeasureAll(false);
+        xPanelView.setChuttyMode(true);
         xPanelView.setCanFling(true);
         xPanelView.setExposedPercent(0.25f);
         xPanelView.setKickBackPercent(0.65f);
-        xPanelView.setOnXPanelMotionListener(new XPanelDragMotionDetection.OnXPanelMotionListener() {
+        xPanelView.setOnXPanelMotionListener(new XPanelDragMotionDetection.OnXPanelEventListener() {
             @Override
-            public void OnDrag(int dragMotion, int offset) {
+            public void onDrag(int dragEvent, int offset, int dy) {
                 String motion = "";
-                switch (dragMotion) {
-                    case XPanelDragMotionDetection.DragMotion.DRAG_DOWN: {
-                        motion = "DRAG_DOWN";
+                switch (dragEvent) {
+                    case XPanelDragMotionDetection.DragEvent.DRAG_MOVE: {
+                        motion = "DRAG_MOVE";
                         break;
                     }
-                    case XPanelDragMotionDetection.DragMotion.DRAG_UP: {
-                        motion = "DRAG_UP";
-                        break;
-                    }
-                    case XPanelDragMotionDetection.DragMotion.DRAG_FLING: {
+                    case XPanelDragMotionDetection.DragEvent.DRAG_FLING: {
                         motion = "DRAG_FLING";
                         break;
                     }
-                    case XPanelDragMotionDetection.DragMotion.DRAG_STOP: {
+                    case XPanelDragMotionDetection.DragEvent.DRAG_STOP: {
                         motion = "DRAG_STOP";
                         break;
                     }
+                    case XPanelDragMotionDetection.DragEvent.DRAG_FINGER_DOWN: {
+                        motion = "DRAG_FINGER_DOWN";
+                        break;
+                    }
+                    case XPanelDragMotionDetection.DragEvent.DRAG_FINGER_UP: {
+                        motion = "DRAG_FINGER_UP";
+                        break;
+                    }
                 }
-                Log.i("OnXPanelMotionListener", "OnDrag dragMotion:" + motion + " offset:" + offset);
+                Log.i("OnXPanelEventListener", "onDrag dragEvent:" + motion + " offset:" + offset + " dy:" + dy);
             }
 
             @Override
-            public void OnCeiling(boolean isCeiling) {
-                Log.i("OnXPanelMotionListener", "OnCeiling isCeiling:" + isCeiling);
+            public void onCeiling(boolean isCeiling) {
+                Log.i("OnXPanelEventListener", "onCeiling isCeiling:" + isCeiling);
             }
 
         });
@@ -101,6 +106,11 @@ public class MainActivity extends AppCompatActivity {
             holder.mItem.setText(bean.text);
             holder.mTime.setText(bean.time + "");
 
+            if (holder.getAdapterPosition() == 0) {
+                holder.itemView.setBackgroundColor(Color.RED);
+            } else {
+                holder.itemView.setBackgroundColor(Color.WHITE);
+            }
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

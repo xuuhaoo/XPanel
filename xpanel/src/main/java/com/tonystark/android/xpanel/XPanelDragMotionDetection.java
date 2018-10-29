@@ -44,7 +44,7 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     private boolean isInBaseLine;
 
-    private OnXPanelMotionListener mOnXPanelMotionListener;
+    private OnXPanelEventListener mOnXPanelEventListener;
 
     public XPanelDragMotionDetection(ViewGroup dragView, ViewGroup dragContainer, IXPanelListScrollCtrl scrollCtrl) {
         mDragView = dragView;
@@ -132,24 +132,16 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
             isOriginState = false;
         }
 
-        if (mOnXPanelMotionListener != null) {
-            int offset = getOffsetPixel();
-
-            if (isInFling) {
-                mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_FLING, offset);
-            } else {
-                if (isDragUp) {
-                    mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_UP, offset);
-                } else {
-                    if (!isInBaseLine) {
-                        mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_DOWN, offset);
-                    }
-                }
+        if (isInFling) {
+            onDragEvent(DragEvent.DRAG_FLING, dy);
+        } else {
+            if (!isInBaseLine) {
+                onDragEvent(DragEvent.DRAG_MOVE, dy);
             }
+        }
 
-            if (top <= 0 != isCeiling) {//call once
-                mOnXPanelMotionListener.OnCeiling(top <= 0);
-            }
+        if (top <= 0 != isCeiling && mOnXPanelEventListener != null) {//call once
+            mOnXPanelEventListener.onCeiling(top <= 0);
         }
 
         isCeiling = top <= 0;
@@ -163,11 +155,12 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
 
     @Override
     public void onViewCaptured(View capturedChild, int activePointerId) {
-
+        onDragEvent(DragEvent.DRAG_FINGER_DOWN, 0);
     }
 
     @Override
     public void onViewReleased(View releasedChild, float xvel, float yvel) {
+        onDragEvent(DragEvent.DRAG_FINGER_UP, 0);
         if (isChuttyMode) {
             float threshold = mDragContainer.getMeasuredHeight() * (mKickBackPercent);
 
@@ -200,9 +193,9 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         if (state == ViewDragHelper.STATE_IDLE) {
             mDragHelper.abort();
             isInFling = false;
-            if (mOnXPanelMotionListener != null) {
+            if (mOnXPanelEventListener != null) {
                 int offset = getOffsetPixel();
-                mOnXPanelMotionListener.OnDrag(DragMotion.DRAG_STOP, offset);
+                mOnXPanelEventListener.onDrag(DragEvent.DRAG_STOP, offset, 0);
             }
         }
     }
@@ -270,8 +263,8 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         return isInBaseLine;
     }
 
-    public void setOnXPanelMotionListener(OnXPanelMotionListener onXPanelMotionListener) {
-        mOnXPanelMotionListener = onXPanelMotionListener;
+    public void setOnXPanelEventListener(OnXPanelEventListener onXPanelEventListener) {
+        mOnXPanelEventListener = onXPanelEventListener;
     }
 
     public boolean shouldInterceptTouchEvent(MotionEvent ev) {
@@ -283,39 +276,50 @@ public class XPanelDragMotionDetection extends ViewDragHelper.Callback {
         return true;
     }
 
-    public interface DragMotion {
+    private void onDragEvent(int event, int dy) {
+        if (mOnXPanelEventListener != null) {
+            mOnXPanelEventListener.onDrag(event, getOffsetPixel(), dy);
+        }
+    }
+
+    public interface DragEvent {
         /**
-         * Drag down
+         * When you drag moving
          */
-        int DRAG_DOWN = 1;
-        /**
-         * Drag up
-         */
-        int DRAG_UP = 2;
+        int DRAG_MOVE = 1;
         /**
          * Drag stop
          */
-        int DRAG_STOP = 3;
+        int DRAG_STOP = 2;
         /**
          * When not touch but in scrolling.
          */
-        int DRAG_FLING = 4;
+        int DRAG_FLING = 3;
+        /**
+         * When you touch the drag view.
+         */
+        int DRAG_FINGER_UP = 4;
+        /**
+         * WHen you release the drag view.
+         */
+        int DRAG_FINGER_DOWN = 5;
     }
 
-    public interface OnXPanelMotionListener {
+    public interface OnXPanelEventListener {
         /**
          * When user drag the view or fling.
          *
-         * @param dragMotion drag motion.
-         * @param offset     offset from original point.
+         * @param dragEvent drag motion.
+         * @param offset    offset from original point.
+         * @param dy        the move pixel in your moving this time.
          */
-        void OnDrag(int dragMotion, int offset);
+        void onDrag(int dragEvent, int offset, int dy);
 
         /**
          * When the drag view touch ceil,top may be small than or equal 0.
          *
          * @param isCeiling true is in ceiling.
          */
-        void OnCeiling(boolean isCeiling);
+        void onCeiling(boolean isCeiling);
     }
 }
